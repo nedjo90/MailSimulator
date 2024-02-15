@@ -1,4 +1,5 @@
 using System.Net.Mail;
+using System.Text;
 
 namespace MailSimulator;
 
@@ -320,17 +321,17 @@ static class MailManager
 
             Mail newMail = new Mail(randomSender, randomListOfReceivers, randomMailObject,
                 randomMessage, randomListOfAttachments);
-            TransferMail(newMail);
+            SendMail(newMail);
         }
     }
+    
 
-
-    public static void TransferMail(Mail mail)
+    public static void SendMail(Mail mail)
     {
         mail.Sender!.ListOfMailsSent.Add(mail);
         foreach (User user in mail.Receiver!)
         {
-            user.ListOfMailsReceived.Add(mail);            
+            user.ListOfMailsReceived.Add(mail);
         }
     }
     public static void DisplayAllUsersWithMails()
@@ -352,8 +353,46 @@ static class MailManager
 
     public static void DisplayUserMailsReceived(User user)
     {
+        
+        int index = 1;
+        Console.Clear();
         ConsoleColorManager.BackBlackForeGreen();
-        Console.WriteLine(user);
+        Console.WriteLine($"Number of received Mails: {user.ListOfMailsReceived.Count}");
+        for (int i = user.ListOfMailsReceived.Count - 1; i >= 0; i--)
+        {
+            ConsoleColorManager.BackBlackForeBlue();
+            Console.Write("➣ {0,-7}", index);
+            ConsoleColorManager.BackBlackForeYellow();
+            Console.Write("({0:d}) -> ", user.ListOfMailsReceived[i].Date);
+            ConsoleColorManager.BackBlackForeMagenta();
+            Console.Write("From {0,-40} => ", user.ListOfMailsReceived[i].Sender!.Address);
+            ConsoleColorManager.BackBlackForeCyan();
+            Console.WriteLine(user.ListOfMailsReceived[i].MessageObject);
+            index++;
+        }
+        ConsoleColorManager.BackBlackForeBlue();
+    }
+    
+    public static void DisplayUserMailsSent(User user)
+    {
+        
+        int index = 1;
+        Console.Clear();
+        ConsoleColorManager.BackBlackForeGreen();
+        Console.WriteLine($"Number of sent Mails: {user.ListOfMailsSent.Count}");
+        for (int i = user.ListOfMailsSent.Count - 1; i >= 0; i--)
+        {
+            ConsoleColorManager.BackBlackForeBlue();
+            Console.Write("➣ {0,-7}", index);
+            ConsoleColorManager.BackBlackForeYellow();
+            Console.Write("({0:d}) -> ", user.ListOfMailsSent[i].Date);
+            ConsoleColorManager.BackBlackForeMagenta();
+            string receivers = user.ListOfMailsSent[i].Receiver[0].Address + ";...";
+            Console.Write("From {0,-40} => ", receivers);
+            ConsoleColorManager.BackBlackForeCyan();
+            Console.WriteLine(user.ListOfMailsSent[i].MessageObject);
+            index++;
+        }
         ConsoleColorManager.BackBlackForeBlue();
     }
 
@@ -371,6 +410,86 @@ static class MailManager
                     user.ListOfMailsReceived.Add(newMail);
             }
         }
+
+        Console.WriteLine(newMail);
+        Console.WriteLine("Your mail was sent !");
+        Thread.Sleep(2000);
+    }
+
+    public static void SendMail(User sender)
+    {
+        Console.Clear();
+        List<User> listOfRecipient = CreateListOfRecipient();
+        string mailObject = CreateMailObject();
+        string mailMessage = CreateMailMessage();
+        List<Attachment> listOfAttachments = CreateListOfAttachments();
+        SendMail(sender, listOfRecipient, mailObject, mailMessage,listOfAttachments);
+    }
+
+    public static List<Attachment> CreateListOfAttachments()
+    {
+        List<Attachment> listOfAttachments = new List<Attachment>();
+        bool isEnoughAttachment = false;
+        Console.WriteLine("Do you want to add an attachment ?(\'N\' -> to next step)");
+        string? answer = Console.ReadLine();
+        if (answer!.Equals("N"))
+            isEnoughAttachment = true;
+        while (isEnoughAttachment == false)
+        {
+            string? attachment;
+            Console.WriteLine("Please enter the attachment of your mail");
+            attachment = Console.ReadLine();  
+            listOfAttachments.Add(new Attachment(attachment!));
+            Console.WriteLine("Do you want to add another attachment ?\n(\'N\' -> to next step)");
+            answer = Console.ReadLine();
+            if (answer!.Equals("N"))
+                isEnoughAttachment = true;
+        }
+        return listOfAttachments;
+    }
+
+    public static string CreateMailMessage()
+    {
+        Console.WriteLine("Please enter the object of your e-mail");
+        string message = "";
+        Console.ReadLine();
+        return message;
+    }
+    public static string CreateMailObject()
+    {
+        Console.WriteLine("Please enter the object of your e-mail");
+        string mailObject = Console.ReadLine();
+        return mailObject;
+    }
+
+    public static List<User> CreateListOfRecipient()
+    {
+        List<User> listOfRecipient = new List<User>();
+        bool isEnoughRecipient = false;
+        while (isEnoughRecipient == false)
+        {
+            string? address;
+            do
+            {
+                Console.WriteLine("Please enter the mail of your recipient");
+                address = Console.ReadLine();  
+            } while (!IsValidAddress(address)) ;
+
+            User? receiverUser = ExistingUser(address);
+            if(receiverUser != null)
+                listOfRecipient.Add(receiverUser);
+            else
+            {
+                receiverUser = CreateAccount(address);
+                listOfRecipient.Add(receiverUser!);
+            }
+            Console.WriteLine("Do you want to add another recipient ?\n(N -> to next step)");
+            string? answer = Console.ReadLine();
+            if (answer!.Equals("N"))
+                isEnoughRecipient = true;
+        }
+
+        return listOfRecipient;
     }
     
     public static void AnswerMail(Mail previous, User sender, List<User> listOfReceivers,

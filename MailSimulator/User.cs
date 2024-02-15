@@ -51,9 +51,23 @@ public class User
             if (i < ListOfMailsReceived.Count - 1)
                 allMails += "\n";
         }
+        for (int i = 0; i < ListOfMailsSent.Count; i++)
+        {
+            allMails += "\n****************************************************************************\n";
+            allMails += ListOfMailsSent[i];
+            if (i < ListOfMailsSent.Count - 1)
+                allMails += "\n";
+        }
         
         string toReturn = $"{Address}\n" +
-                          $"Number of mails: {ListOfMailsReceived.Count}";
+                          $"Number of received mails: {ListOfMailsReceived.Count}\n";
+        if (allMails.Length != 0)
+        {
+            toReturn += "\n";
+            toReturn += allMails;
+        }
+        toReturn = $"{Address}\n" +
+                          $"Number of received mails: {ListOfMailsSent.Count}\n";
         if (allMails.Length != 0)
         {
             toReturn += "\n";

@@ -3,7 +3,8 @@ namespace MailSimulator;
 public enum NavMenu
 {
     Quit,
-    DisplayAllMails,
+    DisplayReceivedMails,
+    DisplaySentMails,
     SendMail,
     Invalid
 }

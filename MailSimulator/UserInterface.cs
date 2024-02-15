@@ -18,8 +18,12 @@ public class UserInterface
         NavMenu choice;
         while ((choice = NavigationMenu()) != NavMenu.Quit)
         {
-            if (choice == NavMenu.DisplayAllMails)
+            if (choice == NavMenu.DisplayReceivedMails)
                 MailManager.DisplayUserMailsReceived(user);
+            else if (choice == NavMenu.DisplaySentMails )
+                MailManager.DisplayUserMailsSent(user);
+            else if (choice == NavMenu.SendMail)
+                MailManager.SendMail(user);
         }
     }
 
@@ -29,8 +33,9 @@ public class UserInterface
         while (choice == NavMenu.Invalid)
         {
             Console.WriteLine($"Please Make a choice: \n" +
-                              $"1 - {NavMenu.DisplayAllMails}\n" +
-                              $"2 - {NavMenu.SendMail}\n" +
+                              $"1 - All received e-mails\n" +
+                              $"2 - All sent e-mails\n" +
+                              $"3 - Send an e-mail\n" +
                               $"0 - {NavMenu.Quit}");
             string? answer = Console.ReadLine();
             try
