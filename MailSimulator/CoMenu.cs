@@ -1,7 +1,8 @@
 namespace MailSimulator;
 
-public enum ConnectionMenu
+public enum CoMenu
 {
+    Quit,
     Connect,
-    Quit
+    Invalid
 }
